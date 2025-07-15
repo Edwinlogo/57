@@ -1,106 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Legal Firm</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Formulario con Desplazamiento Vertical</title>
     <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
+        html, body {
             margin: 0;
             padding: 0;
-            background-color: #f4f7fa;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
         }
-        header {
-            background-color: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 20px 0;
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
-        nav {
-            background-color: #34495e;
-            text-align: center;
-            padding: 10px;
-        }
-        nav a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
-        }
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px;
-        }
-        .service, .about, .contact {
-            background-color: white;
-            margin: 10px;
+        .content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translateX(0);
+            background: rgba(255, 255, 255, 0.7);
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 30%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 360px;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1000;
+            height: 90vh;
+            overflow-y: auto;
+        }
+        .project {
+            margin-bottom: 20px;
+        }
+        .project-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="date"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             box-sizing: border-box;
         }
-        .service img, .about img, .contact img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-        .service h3, .about h3, .contact h3 {
-            color: #2c3e50;
-        }
-        footer {
-            background-color: #2c3e50;
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
             color: white;
+            background-color: #007bff;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 1mm;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .generate-button {
+            background-color: #28a745;
+        }
+        .generate-button:hover {
+            background-color: #218838;
+        }
+        .form-buttons {
             text-align: center;
-            padding: 10px 0;
-            margin-top: 30px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
+    <iframe src="https://cdn-luma.com/public/lumalabs.ai/viewers/sparkles-20240206-a0fe99b/index.html?artifacts=%7B%22light_field%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fbf70759ccc4902ac7302dd475c7e322407f8fb5d0314e63d7e043eb8d915010e%2FCell_Tower_2_light_field.zip%22%2C%22light_field_lf_meta%22%3A%22https%3A%2F%2Fcdn-luma.com%2F1cba2de4c4c278ad96749d88eb57992ec1228d794a0204c26b1ffd409cc1a567%2FCell_Tower_2_light_field_lf_meta.json%22%2C%22slf_model%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fb0720b7a402ecb750700e33137ee796bd89bfd51431a2d4534ae0f6b9fc4f2f7%2FCell_Tower_2_slf_model.luma%22%2C%22slf_model_bg%22%3A%22https%3A%2F%2Fcdn-luma.com%2F7de869ac8b20b99fcdfc4d92b0331bf98016e097ce9db83d5d40bb6b1a7b44ac%2FCell_Tower_2_slf_model_bg.luma%22%2C%22volume_model%22%3Anull%2C%22showBGByDefault%22%3Afalse%2C%22with_background%22%3A%22https%3A%2F%2Fcdn-luma.com%2F12915da71cf3ae00961198c28cc7856ff42a153149472c7bc8a00c6d4c3c1b70%2FCell_Tower_2_with_background.mp4%22%2C%22with_background_preview%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fcc2ba9dfe6948c4bc394ed47eb85f8275ca5d501099cb8c13d739a3cc714d273%2FCell_Tower_2_with_background_preview.jpg%22%2C%22capture_meta%22%3A%7B%22date%22%3A%222024-06-05T00%3A45%3A46.000Z%22%2C%22title%22%3A%22Telecommunications%20Tower%20%22%2C%22thumb%22%3A%22https%3A%2F%2Fcdn-luma.com%2F655ce69078247b5e9347f12d23f967d88e8da023cd1d60806ded76729ea9191a%2FCell_Tower_2_thumb.jpg%22%2C%22slug%22%3A%226c00d0b8-e611-4fb8-8057-1dd89c93b3f5%22%2C%22username%22%3A%22rdakotal%22%2C%22captureName%22%3A%22Telecommunications%20Tower%20%22%2C%22uuid%22%3A%226c00d0b8-e611-4fb8-8057-1dd89c93b3f5%22%2C%22upgrade%22%3A%7B%22available%22%3Afalse%7D%7D%2C%22point_cloud%22%3Anull%2C%22gs_web_meta%22%3Anull%2C%22gs_web_gauss1%22%3Anull%2C%22gs_web_gauss2%22%3Anull%2C%22gs_web_webmeta%22%3Anull%2C%22gs_compressed%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fb05ab82749eda85f6b6686822fd3164ea7b89a36d7f094a6073e908868a92dba%2FCell_Tower_2_gs_compressed.bin%22%2C%22gs_compressed_meta%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fe2fd890d54aa7f65941c3936d611e518cb9f0a7a6ff3a3f7a2968826170e10c4%2FCell_Tower_2_gs_compressed_meta.json%22%2C%22with_background_gs_camera_params%22%3A%22https%3A%2F%2Fcdn-luma.com%2F19cc2cdea139dfa11f9347904cfb1727b8a8dbe1643d07f6aa6fb91159a4f776%2FCell_Tower_2_with_background_gs_camera_params.json%22%2C%22semantics%22%3A%22https%3A%2F%2Fcdn-luma.com%2F1c5e0b93a343cd0faaf060e2314ef8cac1a2be35b5bdb1be301670cc308437ba%2FCell_Tower_2_semantics.bin%22%2C%22skybox%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fb7b77b647fd08dc473fa12ed84d21c17ef24d8a8cb0b0a93dd1f05e2572b55fc%2FCell_Tower_2_skybox.zip%22%2C%22skybox_meta%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fac674dc8491cf7a96bf43f8cd97c12f6ce9132cd8ddd144ab11c5142aff65057%2FCell_Tower_2_skybox_meta.json%22%7D&src=undefined"></iframe>
+    
+    <div class="content">
 
-<header>
-    <h1>Welcome to Our Legal Firm</h1>
-    <p>Your trusted partner for legal services</p>
-</header>
 
-<nav>
-    <a href="#services">Services</a>
-    <a href="#about">About Us</a>
-    <a href="#contact">Contact</a>
-</nav>
 
-<div class="main-content">
-
-    <div id="services" class="service">
-        <img src="https://via.placeholder.com/600x400" alt="Legal services">
-        <h3>Our Services</h3>
-        <p>We provide a wide range of legal services to meet your needs, from business law to personal injury claims. Our experienced team is here to guide you through every step of the legal process.</p>
-    </div>
-
-    <div id="about" class="about">
-        <img src="https://via.placeholder.com/600x400" alt="About our firm">
-        <h3>About Us</h3>
-        <p>Founded in 1999, we have helped thousands of clients with legal issues of all types. Our firm is built on professionalism, integrity, and a commitment to achieving the best results for our clients.</p>
-    </div>
-
-    <div id="contact" class="contact">
-        <img src="https://via.placeholder.com/600x400" alt="Contact us">
-        <h3>Contact Us</h3>
-        <p>Have a legal question? Get in touch with us today! We're available for consultations and can help you find the right legal solution for your situation.</p>
-        <p>Email: contact@legalfirm.com</p>
-        <p>Phone: (555) 123-4567</p>
-    </div>
+<div style="text-align: center;">
+    <img src="https://testingarea.webcindario.com/cealogo.png" alt="CEA" style="width: 100px; height: auto;">
 
 </div>
 
-<footer>
-    <p>&copy; 2024 Legal Firm. All rights reserved.</p>
-</footer>
 
+<a href="https://onedrive.live.com/edit?id=E44472E2C3E87673!s21e21eefd04f48f982acad4b50acceca&resid=E44472E2C3E87673!s21e21eefd04f48f982acad4b50acceca&cid=e44472e2c3e87673&ithint=file%2Cxlsx&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3gvYy9lNDQ0NzJlMmMzZTg3NjczL0lRUHZIdUloVDlENVNJS3NyVXRRck03S0FkcWNvamJRN3pIN2pPc1drMVJaMVMwP2VtPTImd2RBbGxvd0ludGVyYWN0aXZpdHk9RmFsc2UmQWxsb3dUeXBpbmc9VHJ1ZSZBY3RpdmVDZWxsPSdFcXVpcG9zIGVuIFRvcnJlJyFEMTEmd2RIaWRlR3JpZGxpbmVzPVRydWUmd2RIaWRlSGVhZGVycz1UcnVlJndkSW5Db25maWd1cmF0b3I9VHJ1ZSZ3ZEluQ29uZmlndXJhdG9yPVRydWU&migratedtospo=true&embed=1&wdAllowInteractivity=False&AllowTyping=True&ActiveCell=%27Equipos%20en%20Torre%27!D11&wdHideGridlines=True&wdHideHeaders=True&wdInConfigurator=True%2CTrue&wdo=2"><h4>Graficar Equipos en Torre</h4></a>
+
+
+
+        
+        <form id="siteForm">
+            <div id="projectContainer">
+                <div class="project" id="project1">
+                    <label for="sitio1">1. Carpeta de Sitio:</label>
+                    <input type="text" id="sitio1" name="sitio1" required>
+                    <label for="codigo1">Código de Sitio:</label>
+                    <input type="text" id="codigo1" name="codigo1" required>
+                    <label for="fecha1">Fecha (dd-mm-aaaa):</label>
+                    <input type="date" id="fecha1" name="fecha1" required>
+                </div>
+            </div>
+            <div class="form-buttons">
+                <button type="button" onclick="addProject()">Agregar</button>
+                <button type="button" onclick="removeProject()">Eliminar</button>
+                <button type="button" class="generate-button" onclick="generateScript()">Generar Script</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let projectCount = 1;
+
+        function addProject() {
+            projectCount++;
+            const container = document.getElementById('projectContainer');
+            const projectDiv = document.createElement('div');
+            projectDiv.classList.add('project');
+            projectDiv.id = `project${projectCount}`;
+            projectDiv.innerHTML = `
+                <label for="sitio${projectCount}">${projectCount}. Carpeta de Sitio:</label>
+                <input type="text" id="sitio${projectCount}" name="sitio${projectCount}" required>
+                <label for="codigo${projectCount}">Código de Sitio:</label>
+                <input type="text" id="codigo${projectCount}" name="codigo${projectCount}" required>
+                <label for="fecha${projectCount}">Fecha (dd-mm-aaaa):</label>
+                <input type="date" id="fecha${projectCount}" name="fecha${projectCount}" required>
+            `;
+            container.appendChild(projectDiv);
+        }
+
+        function removeProject() {
+            if (projectCount > 1) {
+                const container = document.getElementById('projectContainer');
+                const lastProjectDiv = document.getElementById(`project${projectCount}`);
+                container.removeChild(lastProjectDiv);
+                projectCount--;
+            } else {
+                alert('No se puede eliminar el último proyecto.');
+            }
+        }
+
+        function generateScript() {
+            const scriptLines = [];
+            scriptLines.push('@echo off');
+            scriptLines.push('setlocal enabledelayedexpansion');
+
+            const subfolders = {
+                "ACCESOS": "ACC",
+                "CAMINOS": "CAM",
+                "EDIFICIOS": "EDIF",
+                "EQUIPO EN TORRE": "EQTT",
+                "GENERADOR": "GENE",
+                "NICHOS": "NICH",
+                "TRANSFORMADOR": "TRANS",
+                "PORTA CABLERA": "PORTC",
+                "RETENIDAS ANCLAJES Y BASES": "RETAB",
+                "SHELTERS Y EQUIPOS EN PISO": "SHELT",
+                "SISTEMA DE TIERRAS": "SISTT",
+                "SISTEMA DE ILUMINACION": "SISILU",
+                "VISTA EN PLANTA DESDE LA TORRE": "VIPLATT",
+                "VISTA PANORAMICA DE TORRE": "VIPANT",
+                "VISTA GENERAL DE SITIO": "VIGRAL",
+                "INSPECCION OCULAR A LA ZONA": "INOCUZ",
+                "MANTENIMIENTO PREVENTIVO": "MANTP",
+                "VERTICALIDAD": "VERT",
+                "LINEA DE VIDA": "LINEV",
+                "TORQUE": "TORQ",
+                "DAÑOS": "DAÑ"
+            };
+
+            for (let i = 1; i <= projectCount; i++) {
+                const sitio = document.getElementById(`sitio${i}`).value.trim();
+                const codigo = document.getElementById(`codigo${i}`).value.trim();
+                const dateValue = document.getElementById(`fecha${i}`).value;
+
+                if (!sitio || !codigo || !dateValue) {
+                    alert('Por favor complete todos los campos.');
+                    return;
+                }
+
+                const dateParts = dateValue.split('-');
+                const year = dateParts[0];
+                const month = dateParts[1];
+                const day = dateParts[2];
+                const formattedDate = day + month + year;
+
+                for (const [folder, acronym] of Object.entries(subfolders)) {
+                    scriptLines.push(`for /d %%d in ("%~dp0${sitio}\\REGISTRO FOTOGRAFICO\\*${folder}*") do (`);
+                    scriptLines.push(`    if exist "%%d" (`);
+                    scriptLines.push(`        echo Procesando carpeta: %%d`);
+                    scriptLines.push(`        set count=1`);
+                    scriptLines.push(`        for %%f in ("%%d\\*.jpg" "%%d\\*.jpeg" "%%d\\*.png") do (`);
+                    scriptLines.push(`            echo Renombrando "%%f" a "${codigo}_${acronym}_${formattedDate}_!count!%%~xf"`);
+                    scriptLines.push(`            ren "%%f" "${codigo}_${acronym}_${formattedDate}_!count!%%~xf"`);
+                    scriptLines.push(`            set /a count+=1`);
+                    scriptLines.push(`        )`);
+                    scriptLines.push(`    ) else (`);
+                    scriptLines.push(`        echo Carpeta %%d no encontrada.`);
+                    scriptLines.push(`    )`);
+                    scriptLines.push(`)`);
+                }
+            }
+
+            const blob = new Blob([scriptLines.join('\n')], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'renombrar_imagenes.bat';
+            link.click();
+        }
+    </script>
 </body>
 </html>
