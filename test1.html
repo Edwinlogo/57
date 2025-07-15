@@ -18,14 +18,15 @@
   </style>
 </head>
 <body>
-  <div id="infoBox">Información sobre este punto.<br>
+  <div id="infoBox">
+    Información sobre este punto.<br>
     <a href="https://example.com" target="_blank" style="color:lightblue">Visitar</a>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/PLYLoader.js"></script>
+  <script type="module">
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    import { PLYLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/PLYLoader.js';
 
-  <script>
     let camera, scene, renderer, raycaster, mouse;
     let interactiveObject;
 
@@ -46,8 +47,8 @@
       mouse = new THREE.Vector2();
 
       // Cargar modelo PLY
-      const loader = new THREE.PLYLoader();
-      loader.load('https://threejs.org/examples/models/ply/binary/Lucy100k.ply', function (geometry) {
+      const loader = new PLYLoader();
+      loader.load('https://threejs.org/examples/models/ply/binary/Lucy100k.ply', (geometry) => {
         geometry.computeVertexNormals();
         const material = new THREE.PointsMaterial({ size: 0.005, vertexColors: true });
         const mesh = new THREE.Points(geometry, material);
