@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gaussian Splatting + Interacción</title>
+  <title>Gaussian Splatting Interactivo</title>
   <style>
     body { margin: 0; overflow: hidden; }
     #infoBox {
@@ -19,11 +18,14 @@
   </style>
 </head>
 <body>
-  <div id="infoBox">Información sobre este punto.<br><a href="https://example.com" target="_blank" style="color:lightblue">Visitar</a></div>
-  <script type="module">
-    import * as THREE from 'https://cdn.skypack.dev/three';
-    import { PLYLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/PLYLoader';
+  <div id="infoBox">Información sobre este punto.<br>
+    <a href="https://example.com" target="_blank" style="color:lightblue">Visitar</a>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/PLYLoader.js"></script>
+
+  <script>
     let camera, scene, renderer, raycaster, mouse;
     let interactiveObject;
 
@@ -33,35 +35,34 @@
     function init() {
       scene = new THREE.Scene();
 
-      camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
-      camera.position.z = 2;
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100);
+      camera.position.z = 1;
 
-      renderer = new THREE.WebGLRenderer();
+      renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      // Cargar un archivo PLY genérico
-      const loader = new PLYLoader();
-      loader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/ply/binary/Lucy100k.ply', function (geometry) {
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+
+      // Cargar modelo PLY
+      const loader = new THREE.PLYLoader();
+      loader.load('https://threejs.org/examples/models/ply/binary/Lucy100k.ply', function (geometry) {
         geometry.computeVertexNormals();
         const material = new THREE.PointsMaterial({ size: 0.005, vertexColors: true });
         const mesh = new THREE.Points(geometry, material);
         scene.add(mesh);
       });
 
-      // Crear objeto interactivo (por ejemplo, una esfera invisible en un punto del espacio)
-      const sphereGeometry = new THREE.SphereGeometry(0.05, 16, 16);
-      const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0 });
-      interactiveObject = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      // Crear esfera interactiva invisible
+      const sphereGeo = new THREE.SphereGeometry(0.05, 16, 16);
+      const sphereMat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0 });
+      interactiveObject = new THREE.Mesh(sphereGeo, sphereMat);
       interactiveObject.position.set(0, 0.1, 0);
       scene.add(interactiveObject);
 
-      // Raycaster y mouse para interacción
-      raycaster = new THREE.Raycaster();
-      mouse = new THREE.Vector2();
-
       window.addEventListener('click', onClick, false);
-      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('resize', onWindowResize, false);
     }
 
     function onClick(event) {
