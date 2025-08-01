@@ -1,215 +1,227 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario con Desplazamiento Vertical</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .content {
-            position: fixed;
-            top: 0;
-            left: 0;
-            transform: translateX(0);
-            background: rgba(255, 255, 255, 0.7);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 360px;
-            width: 100%;
-            box-sizing: border-box;
-            z-index: 1000;
-            height: 90vh;
-            overflow-y: auto;
-        }
-        .project {
-            margin-bottom: 20px;
-        }
-        .project-label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input[type="text"],
-        input[type="date"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            background-color: #007bff;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 10px;
-            margin-bottom: 1mm;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .generate-button {
-            background-color: #28a745;
-        }
-        .generate-button:hover {
-            background-color: #218838;
-        }
-        .form-buttons {
-            text-align: center;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <iframe src="https://cdn-luma.com/public/lumalabs.ai/viewers/sparkles-20240206-a0fe99b/index.html?artifacts=%7B%22light_field%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fbf70759ccc4902ac7302dd475c7e322407f8fb5d0314e63d7e043eb8d915010e%2FCell_Tower_2_light_field.zip%22%2C%22light_field_lf_meta%22%3A%22https%3A%2F%2Fcdn-luma.com%2F1cba2de4c4c278ad96749d88eb57992ec1228d794a0204c26b1ffd409cc1a567%2FCell_Tower_2_light_field_lf_meta.json%22%2C%22slf_model%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fb0720b7a402ecb750700e33137ee796bd89bfd51431a2d4534ae0f6b9fc4f2f7%2FCell_Tower_2_slf_model.luma%22%2C%22slf_model_bg%22%3A%22https%3A%2F%2Fcdn-luma.com%2F7de869ac8b20b99fcdfc4d92b0331bf98016e097ce9db83d5d40bb6b1a7b44ac%2FCell_Tower_2_slf_model_bg.luma%22%2C%22volume_model%22%3Anull%2C%22showBGByDefault%22%3Afalse%2C%22with_background%22%3A%22https%3A%2F%2Fcdn-luma.com%2F12915da71cf3ae00961198c28cc7856ff42a153149472c7bc8a00c6d4c3c1b70%2FCell_Tower_2_with_background.mp4%22%2C%22with_background_preview%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fcc2ba9dfe6948c4bc394ed47eb85f8275ca5d501099cb8c13d739a3cc714d273%2FCell_Tower_2_with_background_preview.jpg%22%2C%22capture_meta%22%3A%7B%22date%22%3A%222024-06-05T00%3A45%3A46.000Z%22%2C%22title%22%3A%22Telecommunications%20Tower%20%22%2C%22thumb%22%3A%22https%3A%2F%2Fcdn-luma.com%2F655ce69078247b5e9347f12d23f967d88e8da023cd1d60806ded76729ea9191a%2FCell_Tower_2_thumb.jpg%22%2C%22slug%22%3A%226c00d0b8-e611-4fb8-8057-1dd89c93b3f5%22%2C%22username%22%3A%22rdakotal%22%2C%22captureName%22%3A%22Telecommunications%20Tower%20%22%2C%22uuid%22%3A%226c00d0b8-e611-4fb8-8057-1dd89c93b3f5%22%2C%22upgrade%22%3A%7B%22available%22%3Afalse%7D%7D%2C%22point_cloud%22%3Anull%2C%22gs_web_meta%22%3Anull%2C%22gs_web_gauss1%22%3Anull%2C%22gs_web_gauss2%22%3Anull%2C%22gs_web_webmeta%22%3Anull%2C%22gs_compressed%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fb05ab82749eda85f6b6686822fd3164ea7b89a36d7f094a6073e908868a92dba%2FCell_Tower_2_gs_compressed.bin%22%2C%22gs_compressed_meta%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fe2fd890d54aa7f65941c3936d611e518cb9f0a7a6ff3a3f7a2968826170e10c4%2FCell_Tower_2_gs_compressed_meta.json%22%2C%22with_background_gs_camera_params%22%3A%22https%3A%2F%2Fcdn-luma.com%2F19cc2cdea139dfa11f9347904cfb1727b8a8dbe1643d07f6aa6fb91159a4f776%2FCell_Tower_2_with_background_gs_camera_params.json%22%2C%22semantics%22%3A%22https%3A%2F%2Fcdn-luma.com%2F1c5e0b93a343cd0faaf060e2314ef8cac1a2be35b5bdb1be301670cc308437ba%2FCell_Tower_2_semantics.bin%22%2C%22skybox%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fb7b77b647fd08dc473fa12ed84d21c17ef24d8a8cb0b0a93dd1f05e2572b55fc%2FCell_Tower_2_skybox.zip%22%2C%22skybox_meta%22%3A%22https%3A%2F%2Fcdn-luma.com%2Fac674dc8491cf7a96bf43f8cd97c12f6ce9132cd8ddd144ab11c5142aff65057%2FCell_Tower_2_skybox_meta.json%22%7D&src=undefined"></iframe>
-    
-    <div class="content">
+<html lang="en">
+    <head>
+        <title>SuperSplat Viewer</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <base href="">
+        <link rel="stylesheet" href="./index.css">
+        <script type="module">
+            const url = new URL(location.href);
+            const settingsUrl = url.searchParams.has('settings') ? url.searchParams.get('settings') : './settings.json';
+            const contentUrl = url.searchParams.has('content') ? url.searchParams.get('content') : './scene.compressed.ply';
+            const params = {};
 
+            // apply url parameter overrides
+            if (url.searchParams.has('noui')) params.noui = true;
+            if (url.searchParams.has('noanim')) params.noanim = true;
+            if (url.searchParams.has('poster')) params.posterUrl = url.searchParams.get('poster');
+            if (url.searchParams.has('skybox')) params.skyboxUrl = url.searchParams.get('skybox');
+            if (url.searchParams.has('ministats')) params.ministats = true;
 
-
-<div style="text-align: center;">
-    <img src="https://testingarea.webcindario.com/cealogo.png" alt="CEA" style="width: 100px; height: auto;">
-
-</div>
-
-
-<a href="https://onedrive.live.com/edit?id=E44472E2C3E87673!s21e21eefd04f48f982acad4b50acceca&resid=E44472E2C3E87673!s21e21eefd04f48f982acad4b50acceca&cid=e44472e2c3e87673&ithint=file%2Cxlsx&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3gvYy9lNDQ0NzJlMmMzZTg3NjczL0lRUHZIdUloVDlENVNJS3NyVXRRck03S0FkcWNvamJRN3pIN2pPc1drMVJaMVMwP2VtPTImd2RBbGxvd0ludGVyYWN0aXZpdHk9RmFsc2UmQWxsb3dUeXBpbmc9VHJ1ZSZBY3RpdmVDZWxsPSdFcXVpcG9zIGVuIFRvcnJlJyFEMTEmd2RIaWRlR3JpZGxpbmVzPVRydWUmd2RIaWRlSGVhZGVycz1UcnVlJndkSW5Db25maWd1cmF0b3I9VHJ1ZSZ3ZEluQ29uZmlndXJhdG9yPVRydWU&migratedtospo=true&embed=1&wdAllowInteractivity=False&AllowTyping=True&ActiveCell=%27Equipos%20en%20Torre%27!D11&wdHideGridlines=True&wdHideHeaders=True&wdInConfigurator=True%2CTrue&wdo=2"><h4>Graficar Equipos en Torre</h4></a>
-
-
-
-        
-        <form id="siteForm">
-            <div id="projectContainer">
-                <div class="project" id="project1">
-                    <label for="sitio1">1. Carpeta de Sitio:</label>
-                    <input type="text" id="sitio1" name="sitio1" required>
-                    <label for="codigo1">Código de Sitio:</label>
-                    <input type="text" id="codigo1" name="codigo1" required>
-                    <label for="fecha1">Fecha (dd-mm-aaaa):</label>
-                    <input type="date" id="fecha1" name="fecha1" required>
-                </div>
-            </div>
-            <div class="form-buttons">
-                <button type="button" onclick="addProject()">Agregar</button>
-                <button type="button" onclick="removeProject()">Eliminar</button>
-                <button type="button" class="generate-button" onclick="generateScript()">Generar Script</button>
-            </div>
-        </form>
-    </div>
-
-    <script>
-        let projectCount = 1;
-
-        function addProject() {
-            projectCount++;
-            const container = document.getElementById('projectContainer');
-            const projectDiv = document.createElement('div');
-            projectDiv.classList.add('project');
-            projectDiv.id = `project${projectCount}`;
-            projectDiv.innerHTML = `
-                <label for="sitio${projectCount}">${projectCount}. Carpeta de Sitio:</label>
-                <input type="text" id="sitio${projectCount}" name="sitio${projectCount}" required>
-                <label for="codigo${projectCount}">Código de Sitio:</label>
-                <input type="text" id="codigo${projectCount}" name="codigo${projectCount}" required>
-                <label for="fecha${projectCount}">Fecha (dd-mm-aaaa):</label>
-                <input type="date" id="fecha${projectCount}" name="fecha${projectCount}" required>
-            `;
-            container.appendChild(projectDiv);
-        }
-
-        function removeProject() {
-            if (projectCount > 1) {
-                const container = document.getElementById('projectContainer');
-                const lastProjectDiv = document.getElementById(`project${projectCount}`);
-                container.removeChild(lastProjectDiv);
-                projectCount--;
-            } else {
-                alert('No se puede eliminar el último proyecto.');
-            }
-        }
-
-        function generateScript() {
-            const scriptLines = [];
-            scriptLines.push('@echo off');
-            scriptLines.push('setlocal enabledelayedexpansion');
-
-            const subfolders = {
-                "ACCESOS": "ACC",
-                "CAMINOS": "CAM",
-                "EDIFICIOS": "EDIF",
-                "EQUIPO EN TORRE": "EQTT",
-                "GENERADOR": "GENE",
-                "NICHOS": "NICH",
-                "TRANSFORMADOR": "TRANS",
-                "PORTA CABLERA": "PORTC",
-                "RETENIDAS ANCLAJES Y BASES": "RETAB",
-                "SHELTERS Y EQUIPOS EN PISO": "SHELT",
-                "SISTEMA DE TIERRAS": "SISTT",
-                "SISTEMA DE ILUMINACION": "SISILU",
-                "VISTA EN PLANTA DESDE LA TORRE": "VIPLATT",
-                "VISTA PANORAMICA DE TORRE": "VIPANT",
-                "VISTA GENERAL DE SITIO": "VIGRAL",
-                "INSPECCION OCULAR A LA ZONA": "INOCUZ",
-                "MANTENIMIENTO PREVENTIVO": "MANTP",
-                "VERTICALIDAD": "VERT",
-                "LINEA DE VIDA": "LINEV",
-                "TORQUE": "TORQ",
-                "DAÑOS": "DAÑ"
+            const createImage = (url) => {
+                const img = new Image();
+                img.src = url;
+                return img;
             };
 
-            for (let i = 1; i <= projectCount; i++) {
-                const sitio = document.getElementById(`sitio${i}`).value.trim();
-                const codigo = document.getElementById(`codigo${i}`).value.trim();
-                const dateValue = document.getElementById(`fecha${i}`).value;
+            window.sse = {
+                poster: params.posterUrl && createImage(params.posterUrl),
+                settings: fetch(settingsUrl).then(response => response.json()),
+                contentUrl,
+                contents: fetch(contentUrl),
+                params
+            };
+        </script>
+        <script type="module" src="./index.js"></script>
+    </head>
+    <body>
+        <pc-app antialias="false" depth="false" high-resolution="true" stencil="false">
+            <pc-scene>
+                <!-- Camera (with XR support) -->
+                <pc-entity name="camera root">
+                    <pc-entity name="camera">
+                        <pc-camera near-clip="0.001" far-clip="5000" horizontal-fov="true" tonemap="none"></pc-camera>
+                    </pc-entity>
+                    <!-- XR controllers will be added here -->
+                    <pc-scripts>
+                    </pc-scripts>
+                </pc-entity>
+                <!-- Light (for XR controllers) -->
+                <pc-entity name="light" rotation="35 45 0">
+                    <pc-light color="white" intensity="1.5"></pc-light>
+                </pc-entity>
+                <!-- Splat -->
+                <pc-entity name="splat" rotation="0 0 180">
+                </pc-entity>
+            </pc-scene>
+        </pc-app>
 
-                if (!sitio || !codigo || !dateValue) {
-                    alert('Por favor complete todos los campos.');
-                    return;
-                }
+        <div id="ui">
+            <div id="poster"></div>
 
-                const dateParts = dateValue.split('-');
-                const year = dateParts[0];
-                const month = dateParts[1];
-                const day = dateParts[2];
-                const formattedDate = day + month + year;
+            <!-- Loading Indicator -->
+            <div id="loadingWrap">
+                <div id="loadingText"></div>
+                <div id="loadingBar"></div>
+            </div>
 
-                for (const [folder, acronym] of Object.entries(subfolders)) {
-                    scriptLines.push(`for /d %%d in ("%~dp0${sitio}\\REGISTRO FOTOGRAFICO\\*${folder}*") do (`);
-                    scriptLines.push(`    if exist "%%d" (`);
-                    scriptLines.push(`        echo Procesando carpeta: %%d`);
-                    scriptLines.push(`        set count=1`);
-                    scriptLines.push(`        for %%f in ("%%d\\*.jpg" "%%d\\*.jpeg" "%%d\\*.png") do (`);
-                    scriptLines.push(`            echo Renombrando "%%f" a "${codigo}_${acronym}_${formattedDate}_!count!%%~xf"`);
-                    scriptLines.push(`            ren "%%f" "${codigo}_${acronym}_${formattedDate}_!count!%%~xf"`);
-                    scriptLines.push(`            set /a count+=1`);
-                    scriptLines.push(`        )`);
-                    scriptLines.push(`    ) else (`);
-                    scriptLines.push(`        echo Carpeta %%d no encontrada.`);
-                    scriptLines.push(`    )`);
-                    scriptLines.push(`)`);
-                }
+            <div id="controlsWrap" class="faded-in">
+
+                <!-- Timeline Panel -->
+                <div id="timelineContainer" class="hidden">
+                    <div id="line"></div>
+                    <div id="handle"></div>
+                    <div id="time" class="hidden">0:00</div>
+                </div>
+
+                <!-- Buttons Panel -->
+                <div id="buttonContainer">
+                    <button id="play" class="button hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="4 4 16 16" fill="currentColor"><path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z"/></svg>
+                    </button>
+                    <button id="pause" class="button hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 20 20" fill="currentColor"><path d="M5 16V4h3v12H5zm7-12h3v12h-3V4z"/></svg>
+                    </button>
+                    <div class="spacer"></div>
+                    <button id="arMode" class="button hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-181 240-296q-19-11-29.5-29T200-365v-230q0-22 10.5-40t29.5-29l200-115q19-11 40-11t40 11l200 115q19 11 29.5 29t10.5 40v230q0 22-10.5 40T720-296L520-181q-19 11-40 11t-40-11Zm0-92v-184l-160-93v185l160 92Zm80 0 160-92v-185l-160 93v184ZM80-680v-120q0-33 23.5-56.5T160-880h120v80H160v120H80ZM280-80H160q-33 0-56.5-23.5T80-160v-120h80v120h120v80Zm400 0v-80h120v-120h80v120q0 33-23.5 56.5T800-80H680Zm120-600v-120H680v-80h120q33 0 56.5 23.5T880-800v120h-80ZM480-526l158-93-158-91-158 91 158 93Zm0 45Zm0-45Zm40 69Zm-80 0Z"/></svg>
+                    </button>
+                    <button id="vrMode" class="button hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M300-240q-66 0-113-47t-47-113v-163q0-51 32-89.5t82-47.5q57-11 113-15.5t113-4.5q57 0 113.5 4.5T706-700q50 10 82 48t32 89v163q0 66-47 113t-113 47h-40q-13 0-26-1.5t-25-6.5l-64-22q-12-5-25-5t-25 5l-64 22q-12 5-25 6.5t-26 1.5h-40Zm0-80h40q7 0 13.5-1t12.5-3q29-9 56.5-19t57.5-10q30 0 58 9.5t56 19.5q6 2 12.5 3t13.5 1h40q33 0 56.5-23.5T740-400v-163q0-22-14-38t-35-21q-52-11-104.5-14.5T480-640q-54 0-106 4t-105 14q-21 4-35 20.5T220-563v163q0 33 23.5 56.5T300-320ZM40-400v-160h60v160H40Zm820 0v-160h60v160h-60Zm-380-80Z"/></svg>
+                    </button>
+                    <button id="info" class="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                    </button>
+                    <button id="settings" class="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h480q33 0 56.5 23.5T720-720v180l160-160v440L720-420v180q0 33-23.5 56.5T640-160H160Zm0-80h480v-480H160v480Zm0 0v-480 480Z"/></svg>
+                    </button>
+                    <button id="enterFullscreen" class="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M120-120v-200h80v120h120v80H120Zm520 0v-80h120v-120h80v200H640ZM120-640v-200h200v80H200v120h-80Zm640 0v-120H640v-80h200v200h-80Z"/></svg>
+                    </button>
+                    <button id="exitFullscreen" class="button hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M240-120v-120H120v-80h200v200h-80Zm400 0v-200h200v80H720v120h-80ZM120-640v-80h120v-120h80v200H120Zm520 0v-200h80v120h120v80H640Z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Panel -->
+            <div id="settingsPanel" class="hidden">
+                <div>Camera Mode</div>
+                <div id="cameraToggle" class="toggleWrap">
+                    <div id="cameraToggleHighlight" class="toggleHighlight"></div>
+                    <button id="orbit" class="left">Orbit</button>
+                    <button id="fly" class="right">Fly</button>
+                </div>
+                <div>Render Quality</div>
+                <div id="qualityToggle" class="toggleWrap">
+                    <div id="qualityToggleHighlight" class="toggleHighlight"></div>
+                    <button id="low" class="left">Low</button>
+                    <button id="high" class="right">High</button>
+                </div>
+                <div>View</div>
+                <div class="settingsRow">
+                    <button id="frame" class="button">Frame</button>
+                    <button id="reset" class="button">Reset</button>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div id="infoPanel" class="hidden">
+                <div id="infoPanelContent" onpointerdown="event.stopPropagation()">
+                    <div id="header">Controls</div>
+                    <div id="tabs">
+                        <div id="desktopTab" class="tab active">Desktop</div>
+                        <div id="touchTab" class="tab">Touch</div>
+                    </div>
+                    <div id="infoPanels">
+                        <div id="desktopInfoPanel">
+                            <div class="control-spacer"></div>
+                            <h1>Orbit Mode</h1>
+                            <div class="control-item">
+                                <span class="control-action">Orbit</span>
+                                <span class="control-key">Left Mouse</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Pan</span>
+                                <span class="control-key">Right Mouse</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Zoom</span>
+                                <span class="control-key">Mouse Wheel</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Set Focus</span>
+                                <span class="control-key">Double Click</span>
+                            </div>
+                            <div class="control-spacer"></div>
+                            <h1>Fly Mode</h1>
+                            <div class="control-item">
+                                <span class="control-action">Look Around</span>
+                                <span class="control-key">Left Mouse</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Fly</span>
+                                <span class="control-key">W,S,A,D</span>
+                            </div>
+                            <div class="control-spacer"></div>
+                            <div class="control-item">
+                                <span class="control-action">Frame Scene</span>
+                                <span class="control-key">F</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Reset Camera</span>
+                                <span class="control-key">R</span>
+                            </div>
+                        </div>
+                        <div id="touchInfoPanel" class="hidden">
+                            <div class="control-spacer"></div>
+                            <h1>Orbit Mode</h1>
+                            <div class="control-item">
+                                <span class="control-action">Orbit</span>
+                                <span class="control-key">One Finger Drag</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Pan</span>
+                                <span class="control-key">Two Finger Drag</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Zoom</span>
+                                <span class="control-key">Pinch</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Set Focus</span>
+                                <span class="control-key">Double Tap</span>
+                            </div>
+                            <div class="control-spacer"></div>
+                            <h1>Fly Mode</h1>
+                            <div class="control-item">
+                                <span class="control-action">Look Around</span>
+                                <span class="control-key">Touch on Right</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-action">Fly</span>
+                                <span class="control-key">Touch on Left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Touch Joystick -->
+            <div id="joystickBase" class="hidden">
+                <div id="joystick"></div>
+            </div>
+        </div>
+        <script type="module">
+            // Load the poster image if available
+            const poster = window.sse?.poster;
+            if (poster) {
+                const element = document.getElementById('poster');
+                element.style.backgroundImage = `url(${poster.src})`;
+                element.style.display = 'block';
+                element.style.filter = 'blur(40px)';
             }
-
-            const blob = new Blob([scriptLines.join('\n')], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'renombrar_imagenes.bat';
-            link.click();
-        }
-    </script>
-</body>
+        </script>
+    </body>
 </html>
