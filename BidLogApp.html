@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            background-color: #ffffff;
+            padding-top: 20px;
+        }
+        .safe-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        .safe {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://tiendaonline.yalecolombia.com/cdn/shop/files/caja-fuerte-mediana_740x.jpg?v=1712680636');
+            background-size: cover;
+            background-position: center;
+        }
+        .dial {
+            position: absolute;
+            top: 50%;
+            left: 48%;
+            width: 100px;
+            height: 100px;
+            background-image: url('https://systemsecuritylock247.com/wp-content/uploads/2021/12/loader_content.png');
+            background-size: cover;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            transform-origin: center;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+        .display {
+            margin-top: 20px;
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            padding: 10px 20px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            width: 200px;
+        }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            width: 200px;
+        }
+        .key {
+            font-size: 18px;
+            padding: 10px;
+            background-color: #0c6b09;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .key:hover {
+            background-color: #0056b3;
+        }
+        .reset-key {
+            font-size: 18px;
+            padding: 10px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            grid-column: span 2;
+        }
+        .reset-key:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="safe-container">
+        <div class="safe"></div>
+        <div class="dial" id="dial"></div>
+    </div>
+    <div class="display" id="display">----</div>
+    <div class="keypad" id="keypad">
+        <button class="key" data-value="1">1</button>
+        <button class="key" data-value="2">2</button>
+        <button class="key" data-value="3">3</button>
+        <button class="key" data-value="4">4</button>
+        <button class="key" data-value="5">5</button>
+        <button class="key" data-value="6">6</button>
+        <button class="key" data-value="7">7</button>
+        <button class="key" data-value="8">8</button>
+        <button class="key" data-value="9">9</button>
+        <button class="key" data-value="0">0</button>
+        <button class="reset-key" id="reset">Reset</button>
+    </div>
+
+    <script>
+        const dial = document.getElementById('dial');
+        const display = document.getElementById('display');
+        const resetButton = document.getElementById('reset');
+        const keypad = document.getElementById('keypad');
+
+        let currentAngle = 0;
+        let enteredNumbers = '';
+
+        const updateDisplay = () => {
+            display.textContent = enteredNumbers.padEnd(4, '-');
+        };
+
+        const checkCode = () => {
+            if (enteredNumbers === '0000') {
+                window.location.href = 'https://sites.google.com/view/pcmasonry/oops';
+				
+            } else if (enteredNumbers === '2026') {
+                window.location.href = 'https://www.appsheet.com/start/ddfaaf5f-509c-488b-9cf5-035c5b7822ab';
+            } else {
+                alert('Contraseña incorrecta');
+                enteredNumbers = '';
+                updateDisplay();
+            }
+        };
+
+        const rotateDial = (number) => {
+            const previousAngle = currentAngle;
+            currentAngle = -(number * (360 / 10));
+
+            if (Math.abs(currentAngle - previousAngle) > 180) {
+                if (currentAngle > previousAngle) {
+                    currentAngle -= 360;
+                } else {
+                    currentAngle += 360;
+                }
+            }
+
+            dial.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
+        };
+
+        keypad.addEventListener('click', (event) => {
+            const key = event.target;
+            if (key.classList.contains('key')) {
+                const number = key.getAttribute('data-value');
+                if (enteredNumbers.length < 4) {
+                    enteredNumbers += number;
+                    updateDisplay();
+                    rotateDial(Number(number));
+                    if (enteredNumbers.length === 4) {
+                        setTimeout(checkCode, 350);
+                    }
+                }
+            } else if (key.classList.contains('reset-key')) {
+                enteredNumbers = '';
+                updateDisplay();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            if (key >= '0' && key <= '9') {
+                if (enteredNumbers.length < 4) {
+                    enteredNumbers += key;
+                    updateDisplay();
+                    rotateDial(Number(key));
+                    if (enteredNumbers.length === 4) {
+                        setTimeout(checkCode, 350);
+                    }
+                }
+            } else if (key === 'Backspace') {
+                enteredNumbers = enteredNumbers.slice(0, -1);
+                updateDisplay();
+            } else if (key === 'Delete') {
+                enteredNumbers = '';
+                updateDisplay();
+            }
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
