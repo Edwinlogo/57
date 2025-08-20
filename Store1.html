@@ -9,7 +9,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
   <style>
-    /* ========= CURSOR PERSONALIZADO (Ajusta tamaño/hotspot aquí) ========= */
+    /* ========= CURSOR PERSONALIZADO ========= */
     :root{
       --cursor-size: 32px;          /* tamaño visible del cursor */
       --cursor-hotspot-x: 16px;     /* punto activo X (desde la izquierda) */
@@ -39,14 +39,14 @@
       padding: 20px;
       color: #333; /* Color de texto principal */
 
-      /* 🔒 Desactivar selección de texto general y menú táctil */
+      /* Desactivar selección de texto general y menú táctil */
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
       -webkit-touch-callout: none;
 
-      /* 🫥 Ocultar cursor nativo (usamos el custom) */
+      /* Ocultar cursor nativo (usamos el custom) */
       cursor: none;
     }
 
@@ -378,7 +378,11 @@
       let toShow = filtered.slice(0, visibleCount);
 
       if (toShow.length===0) {
-        grid.innerHTML = "<p style='color:white;'>No hay productos disponibles.</p>";
+        grid.innerHTML = "<p style='color:white;'>
+          "No hay publicaciones que coincidan con tu búsqueda."<br>
+          "Revisa la ortografía de la palabra."<br>
+          "Utiliza palabras más genéricas o menos palabras."<br>
+          "Navega por las categorías para encontrar un producto similar"</p>";
         document.getElementById("loadMoreBtn").style.display = "none";
         return;
       }
