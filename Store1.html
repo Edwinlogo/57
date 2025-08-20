@@ -378,7 +378,7 @@
       let toShow = filtered.slice(0, visibleCount);
 
       if (toShow.length===0) {
-        grid.innerHTML = "<p style='color:white;'>No hay productos que coincidan con tu búsqueda, Revisa la ortografía de la palabra, Utiliza palabras más genéricas o menos palabras, Navega por las categorías para encontrar un producto similar</p>";
+        grid.innerHTML = "<p style='color:white;'>No hay coincidencias con tu búsqueda</p>";
         document.getElementById("loadMoreBtn").style.display = "none";
         return;
       }
