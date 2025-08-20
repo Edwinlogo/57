@@ -4,110 +4,199 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catálogo de Productos</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
-    header { background: #333; color: white; padding: 1rem; text-align: center; }
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; padding: 1rem; }
-    .card { background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
-    .card:hover { transform: scale(1.03); }
-    .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; }
-    .card h3 { margin: 0.5rem 0; font-size: 1.1rem; }
-    .price { color: green; font-weight: bold; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
-    .modal-content { background: white; padding: 1rem; border-radius: 8px; max-width: 600px; width: 90%; position: relative; }
-    .close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; }
-    .images { display: flex; gap: 0.5rem; overflow-x: auto; margin-top: 1rem; }
-    .images img { height: 100px; border-radius: 6px; }
-    .share-link { margin-top: 1rem; display: inline-block; background: #007BFF; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 40px; color: white; }
+    .header h1 { font-size: 2.5rem; margin: 0; }
+    .categories { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
+    .category-btn {
+      padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer;
+      background: rgba(255,255,255,0.9); font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .category-btn:hover, .category-btn.active {
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color: white;
+    }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap: 20px; }
+    .product-card {
+      background: white; border-radius: 15px; overflow: hidden;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15); cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .product-card:hover { transform: translateY(-5px); }
+    .product-image { width: 100%; height: 200px; object-fit: cover; }
+    .product-info { padding: 15px; }
+    .product-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
+    .product-price { font-size: 1.2rem; color: #667eea; font-weight: bold; margin-bottom: 5px; }
+    .product-category { font-size: 0.9rem; background: #eee; padding: 2px 10px; border-radius: 10px; display: inline-block; }
+
+    /* Modal */
+    .modal {
+      display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+      justify-content: center; align-items: center;
+    }
+    .modal-content {
+      background: white; border-radius: 15px; max-width: 800px; width: 90%;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header {
+      padding: 20px; background: linear-gradient(135deg,#667eea,#764ba2);
+      color: white; border-radius: 15px 15px 0 0; position: relative;
+    }
+    .close { position: absolute; right: 20px; top: 20px; cursor: pointer; font-size: 24px; }
+    .modal-body { padding: 20px; }
+    .modal-images { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+    .modal-images img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+    .modal-price { font-size: 1.5rem; color: #667eea; font-weight: bold; margin-bottom: 10px; }
+    .share-container { display: flex; gap: 10px; margin-top: 15px; }
+    .share-btn {
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: white; border: none; padding: 8px 16px; border-radius: 20px;
+      cursor: pointer; font-weight: bold;
+    }
+    .share-url { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Catálogo de Productos</h1>
-  </header>
+  <div class="container">
+    <div class="header">
+      <h1>🛍️ Catálogo de Productos</h1>
+      <p>Descubre nuestros increíbles productos</p>
+    </div>
 
-  <div class="products-grid" id="productsGrid"></div>
+    <div id="categories" class="categories"></div>
+    <div id="productsGrid" class="products-grid"></div>
+  </div>
 
-  <div class="modal" id="productModal">
+  <!-- Modal -->
+  <div id="productModal" class="modal">
     <div class="modal-content">
-      <span class="close" id="closeModal">&times;</span>
-      <h2 id="modalName"></h2>
-      <p class="price" id="modalPrice"></p>
-      <p id="modalDesc"></p>
-      <div class="images" id="modalImages"></div>
-      <a href="#" target="_blank" id="shareLink" class="share-link">Compartir</a>
+      <div class="modal-header">
+        <span id="modalTitle"></span>
+        <span class="close" onclick="closeModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="modalImages" class="modal-images"></div>
+        <div id="modalPrice" class="modal-price"></div>
+        <div id="modalDescription"></div>
+        <div class="share-container">
+          <button id="shareBtn" class="share-btn">🔗 Generar Link</button>
+          <input type="text" id="shareUrl" class="share-url" readonly />
+        </div>
+      </div>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
-    const sheetUrl = "TU_LINK_CSV_AQUI"; // reemplazar con el link CSV de tu Google Sheet
     let products = [];
+    let currentProduct = null;
 
-    // Cargar datos desde Google Sheets CSV
+    // 🔗 Pega aquí tu link de Google Sheets publicado como CSV
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTL98VUgPTrUmCr4yEKah1YpiEZf7qnQO2cXev14OM17P52F1X8sBm17WthSRyU4SCZhRnPPJp5DVty/pub?gid=0&single=true&output=csv";
+
     fetch(sheetUrl)
       .then(res => res.text())
       .then(csv => {
-        const parsed = Papa.parse(csv, { header: true });
-        products = parsed.data.filter(p => p.ID && p.nombre);
-        displayProducts();
-        checkUrlForProduct();
+        Papa.parse(csv, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            products = results.data.filter(p => p.nombre && p.precio && p.categoria);
+            createCategoryButtons();
+            displayProducts();
+            loadFromUrl();
+          }
+        });
       });
 
-    // Mostrar productos
-    function displayProducts() {
-      const grid = document.getElementById("productsGrid");
-      grid.innerHTML = "";
-
-      products.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${p.imagen1}" alt="${p.nombre}">
-          <h3>${p.nombre}</h3>
-          <p class="price">$${Number(p.precio).toLocaleString("es-CO")}</p>
-        `;
-        card.onclick = () => openModal(p.ID);
-        grid.appendChild(card);
+    function createCategoryButtons() {
+      const cats = [...new Set(products.map(p => p.categoria))];
+      const categoriesDiv = document.getElementById("categories");
+      categoriesDiv.innerHTML = `<button class="category-btn active" onclick="filterProducts('todos', this)">Todos</button>`;
+      cats.forEach(cat => {
+        categoriesDiv.innerHTML += `<button class="category-btn" onclick="filterProducts('${cat}', this)">${cat}</button>`;
       });
     }
 
-    // Abrir modal
-    function openModal(productId) {
-      const p = products.find(prod => prod.ID === productId);
-      if (!p) return;
-      document.getElementById("modalName").innerText = p.nombre;
-      document.getElementById("modalPrice").innerText = "$" + Number(p.precio).toLocaleString("es-CO");
-      document.getElementById("modalDesc").innerText = p.descripcion;
+    function filterProducts(cat, btn) {
+      document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      displayProducts(cat);
+    }
 
-      const imagesDiv = document.getElementById("modalImages");
-      imagesDiv.innerHTML = "";
-      for (let i = 1; i <= 5; i++) {
-        if (p["imagen"+i]) {
-          const img = document.createElement("img");
-          img.src = p["imagen"+i];
-          imagesDiv.appendChild(img);
-        }
+    function displayProducts(cat="todos") {
+      const grid = document.getElementById("productsGrid");
+      let filtered = cat==="todos" ? products : products.filter(p => p.categoria===cat);
+      if (filtered.length===0) {
+        grid.innerHTML = "<p style='color:white;'>No hay productos en esta categoría.</p>";
+        return;
       }
+      grid.innerHTML = filtered.map(p => `
+        <div class="product-card" onclick="openModal('${p.nombre}')">
+          <img class="product-image" src="${p.imagen1 || 'https://via.placeholder.com/250x200?text=Sin+Imagen'}" alt="${p.nombre}">
+          <div class="product-info">
+            <div class="product-name">${p.nombre}</div>
+            <div class="product-price">$${parseFloat(p.precio).toLocaleString('es-CO')}</div>
+            <div class="product-category">${p.categoria}</div>
+          </div>
+        </div>
+      `).join('');
+    }
 
-      const shareLink = document.getElementById("shareLink");
-      shareLink.href = window.location.origin + window.location.pathname + "?producto=" + p.ID;
+    function openModal(name) {
+      const product = products.find(p => p.nombre === name);
+      if (!product) return;
+      currentProduct = product;
+
+      document.getElementById("modalTitle").textContent = product.nombre;
+      document.getElementById("modalPrice").textContent = "$" + parseFloat(product.precio).toLocaleString('es-CO');
+      document.getElementById("modalDescription").textContent = product.descripcion || "Sin descripción disponible";
+
+      const imgs = [product.imagen1, product.imagen2, product.imagen3, product.imagen4, product.imagen5].filter(Boolean);
+      document.getElementById("modalImages").innerHTML = imgs.length > 0 ? imgs.map(img => `<img src="${img}">`).join("") : `<img src="https://via.placeholder.com/400x200?text=Sin+Imagen">`;
 
       document.getElementById("productModal").style.display = "flex";
     }
 
-    // Cerrar modal
-    document.getElementById("closeModal").onclick = () => {
+    function closeModal() {
       document.getElementById("productModal").style.display = "none";
+      currentProduct = null;
+    }
+
+    document.getElementById("shareBtn").onclick = function() {
+      if (!currentProduct) return;
+      const base = window.location.origin + window.location.pathname;
+      const link = base + "?producto=" + encodeURIComponent(currentProduct.nombre);
+      const shareUrl = document.getElementById("shareUrl");
+      shareUrl.value = link;
+      shareUrl.select();
+      document.execCommand("copy");
+      this.textContent = "✅ Copiado!";
+      setTimeout(()=> this.textContent = "🔗 Generar Link", 2000);
     };
 
-    // Revisar si hay producto en la URL
-    function checkUrlForProduct() {
+    // Cargar producto directo desde URL (?producto=...)
+    function loadFromUrl() {
       const params = new URLSearchParams(window.location.search);
-      if (params.has("producto")) {
-        openModal(params.get("producto"));
-      }
+      const prod = params.get("producto");
+      if (prod) openModal(decodeURIComponent(prod));
     }
+
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function(e) {
+      if (e.target.id === "productModal") closeModal();
+    };
   </script>
 </body>
 </html>
