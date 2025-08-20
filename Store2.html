@@ -4,189 +4,332 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catálogo de Productos</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    header { background: #333; color: #fff; padding: 10px; text-align: center; }
-    #categorias { margin: 10px; text-align: center; }
-    #categorias button { margin: 5px; padding: 8px 12px; cursor: pointer; }
-    #busqueda { margin: 10px auto; display: block; padding: 8px; width: 90%; max-width: 400px; }
-    #productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 15px; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 40px; color: white; }
+    .header h1 { font-size: 2.5rem; margin: 0; }
 
-    .producto { border: 1px solid #ccc; border-radius: 8px; padding: 10px; text-align: center; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .producto img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; cursor: pointer; }
-    .producto h3 { margin: 10px 0 5px; font-size: 18px; }
-    .producto p { margin: 5px 0; font-size: 14px; }
+    /* Barra de búsqueda */
+    .search-bar { display: flex; justify-content: center; margin: 20px 0; }
+    .search-bar input {
+      width: 100%; max-width: 500px; padding: 12px 18px; border-radius: 25px;
+      border: none; outline: none; font-size: 1rem;
+    }
+
+    .categories { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 25px; }
+    .category-btn {
+      padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer;
+      background: rgba(255,255,255,0.9); font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .category-btn:hover, .category-btn.active {
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color: white;
+    }
+
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap: 20px; }
+    .product-card {
+      background: white; border-radius: 15px; overflow: hidden;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15); cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .product-card:hover { transform: translateY(-5px); }
+    .product-image { width: 100%; height: 200px; object-fit: cover; }
+    .product-info { padding: 15px; }
+    .product-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
+    .product-price { font-size: 1.2rem; color: #667eea; font-weight: bold; margin-bottom: 5px; }
+    .product-category { font-size: 0.9rem; background: #eee; padding: 2px 10px; border-radius: 10px; display: inline-block; }
+
+    /* Botón cargar más */
+    .load-more {
+      display: block; margin: 30px auto; padding: 12px 24px; border: none;
+      border-radius: 25px; background: white; cursor: pointer; font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .load-more:hover {
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color: white;
+    }
 
     /* Modal */
-    #modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-    #modal-content { background: #fff; margin: 5% auto; padding: 20px; width: 90%; max-width: 600px; border-radius: 8px; position: relative; text-align: center; }
-    #modal h2 { margin-top: 0; }
-    #modal p { font-size: 14px; }
-    .close { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; }
+    .modal {
+      display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+      justify-content: center; align-items: center; padding: 15px;
+    }
+    .modal-content {
+      background: white; border-radius: 15px; max-width: 850px; width: 100%;
+      max-height: 90vh; overflow-y: auto; position: relative;
+    }
+    .modal-header {
+      padding: 20px; background: linear-gradient(135deg,#667eea,#764ba2);
+      color: white; border-radius: 15px 15px 0 0; position: relative;
+    }
+    .close { position: absolute; right: 20px; top: 20px; cursor: pointer; font-size: 28px; }
+    .modal-body { padding: 20px; }
 
-    .carousel { position: relative; max-width: 100%; }
-    .carousel img { width: 100%; height: auto; object-fit: contain; cursor: pointer; }
-    .prev, .next { cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); font-size: 30px; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border-radius: 50%; }
-    .prev { left: 10px; }
-    .next { right: 10px; }
+    /* Carrusel */
+    .carousel { position: relative; margin-bottom: 20px; text-align: center; }
+    .carousel img {
+      max-width: 100%; max-height: 350px; object-fit: contain; border-radius: 10px;
+      cursor: pointer;
+    }
+    .carousel-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.5); color: white; border: none;
+      font-size: 22px; cursor: pointer; padding: 10px; border-radius: 50%;
+    }
+    .carousel-btn.left { left: 15px; }
+    .carousel-btn.right { right: 15px; }
 
-    /* Pantalla completa para imagen */
-    #fullscreen-view { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
-    #fullscreen-view img { max-width: 95%; max-height: 95%; object-fit: contain; }
-    #close-fullscreen { position: absolute; top: 20px; right: 30px; font-size: 40px; color: #fff; cursor: pointer; }
+    .modal-price { font-size: 1.5rem; color: #667eea; font-weight: bold; margin-bottom: 12px; }
+    .share-container { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    .share-btn {
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: white; border: none; padding: 10px 18px; border-radius: 20px;
+      cursor: pointer; font-weight: bold;
+    }
+    .share-url { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; min-width: 200px; }
+
+    /* Lightbox (imagen fullscreen) */
+    .lightbox {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95); justify-content: center; align-items: center; z-index: 2000;
+    }
+    .lightbox img {
+      max-width: 90%; max-height: 90%; object-fit: contain;
+    }
+    .lightbox-close {
+      position: absolute; top: 20px; right: 30px; font-size: 35px;
+      color: white; cursor: pointer; font-weight: bold;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .product-image { height: 160px; }
+      .modal-content { width: 95%; }
+      .carousel img { max-height: 250px; }
+      .product-name { font-size: 1rem; }
+      .product-price { font-size: 1.1rem; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Catálogo de Productos</h1>
-  </header>
-  <input type="text" id="busqueda" placeholder="Buscar productos...">
-  <div id="categorias"></div>
-  <div id="productos"></div>
+  <div class="container">
+    <div class="header">
+      <h1>🛍️ Catálogo de Productos</h1>
+      <p>Descubre nuestros increíbles productos</p>
+    </div>
 
-  <!-- Modal -->
-  <div id="modal">
-    <div id="modal-content">
-      <span class="close">&times;</span>
-      <h2 id="modal-nombre"></h2>
-      <div class="carousel">
-        <span class="prev">&#10094;</span>
-        <img id="modal-imagen" src="" alt="">
-        <span class="next">&#10095;</span>
+    <!-- 🔍 Barra de búsqueda -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Buscar productos...">
+    </div>
+
+    <div id="categories" class="categories"></div>
+    <div id="productsGrid" class="products-grid"></div>
+    <button id="loadMoreBtn" class="load-more">Cargar más</button>
+  </div>
+
+  <!-- Modal producto -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span id="modalTitle"></span>
+        <span class="close" onclick="closeModal()">&times;</span>
       </div>
-      <p id="modal-precio"></p>
-      <p id="modal-descripcion"></p>
-      <button id="shareBtn">Compartir producto</button>
+      <div class="modal-body">
+        <!-- 🖼️ Carrusel -->
+        <div class="carousel">
+          <button class="carousel-btn left" onclick="prevImage()">&#10094;</button>
+          <img id="carouselImage" src="" alt="Imagen producto" onclick="openLightbox()">
+          <button class="carousel-btn right" onclick="nextImage()">&#10095;</button>
+        </div>
+        <div id="modalPrice" class="modal-price"></div>
+        <div id="modalDescription"></div>
+        <div class="share-container">
+          <button id="shareBtn" class="share-btn">🔗 Generar Link</button>
+          <input type="text" id="shareUrl" class="share-url" readonly />
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Vista fullscreen -->
-  <div id="fullscreen-view">
-    <span id="close-fullscreen">&times;</span>
-    <img id="fullscreen-img" src="" alt="">
+  <!-- Lightbox fullscreen -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightboxImage" src="">
   </div>
 
   <script>
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2qA4It3yYd2xKUVBPFezHxl6a5MM2uMzNRRaD7eFmQmU8I6GJUP3ChnqSibdYHw/pub?gid=0&single=true&output=csv";
-    let productos = [], productosFiltrados = [], imagenesModal = [], indiceImagen = 0;
-    const contenedor = document.getElementById("productos");
-    const categoriasDiv = document.getElementById("categorias");
-    const busquedaInput = document.getElementById("busqueda");
+    let products = [];
+    let currentProduct = null;
+    let currentImages = [];
+    let currentIndex = 0;
 
-    // Modal
-    const modal = document.getElementById("modal");
-    const modalNombre = document.getElementById("modal-nombre");
-    const modalImagen = document.getElementById("modal-imagen");
-    const modalPrecio = document.getElementById("modal-precio");
-    const modalDescripcion = document.getElementById("modal-descripcion");
-    const closeModal = document.querySelector(".close");
+    let visibleCount = 12;
+    const perPage = 12;
 
-    // Fullscreen
-    const fullscreenView = document.getElementById("fullscreen-view");
-    const fullscreenImg = document.getElementById("fullscreen-img");
-    const closeFullscreen = document.getElementById("close-fullscreen");
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTL98VUgPTrUmCr4yEKah1YpiEZf7qnQO2cXev14OM17P52F1X8sBm17WthSRyU4SCZhRnPPJp5DVty/pub?gid=0&single=true&output=csv";
 
-    // Cargar productos
-    fetch(url).then(res => res.text()).then(data => {
-      const filas = data.split("\n").map(f => f.split(","));
-      const headers = filas[0];
-      productos = filas.slice(1).map(fila => {
-        let obj = {};
-        headers.forEach((h, i) => obj[h.trim()] = fila[i] ? fila[i].trim() : "");
-        obj.imagenes = [obj.Imagen1, obj.Imagen2, obj.Imagen3, obj.Imagen4, obj.Imagen5].filter(x => x);
-        return obj;
+    fetch(sheetUrl)
+      .then(res => res.text())
+      .then(csv => {
+        Papa.parse(csv, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            products = results.data.filter(p => p.nombre && p.precio && p.categoria);
+            createCategoryButtons();
+            displayProducts();
+            loadFromUrl();
+          }
+        });
       });
-      mostrarCategorias();
-      mostrarProductos(productos);
-      productosFiltrados = productos;
-      verificarParametroURL();
-    });
 
-    function mostrarCategorias() {
-      const cats = [...new Set(productos.map(p => p.Categoria))];
-      categoriasDiv.innerHTML = `<button onclick="filtrarCategoria('all')">Todos</button>` +
-        cats.map(c => `<button onclick="filtrarCategoria('${c}')">${c}</button>`).join("");
-    }
-
-    function mostrarProductos(lista) {
-      contenedor.innerHTML = "";
-      lista.forEach((p, idx) => {
-        const div = document.createElement("div");
-        div.className = "producto";
-        div.innerHTML = `
-          <img src="${p.Imagen1}" alt="${p.Nombre}" onclick="abrirModal(${productos.indexOf(p)})">
-          <h3>${p.Nombre}</h3>
-          <p><strong>$${p.Precio}</strong></p>
-          <p>${p.Categoria}</p>
-        `;
-        contenedor.appendChild(div);
+    function createCategoryButtons() {
+      const cats = [...new Set(products.map(p => p.categoria))];
+      const categoriesDiv = document.getElementById("categories");
+      categoriesDiv.innerHTML = `<button class="category-btn active" onclick="filterProducts('todos', this)">Todos</button>`;
+      cats.forEach(cat => {
+        categoriesDiv.innerHTML += `<button class="category-btn" onclick="filterProducts('${cat}', this)">${cat}</button>`;
       });
     }
 
-    function filtrarCategoria(cat) {
-      productosFiltrados = (cat === 'all') ? productos : productos.filter(p => p.Categoria === cat);
-      mostrarProductos(productosFiltrados);
+    function filterProducts(cat, btn) {
+      document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentCategory = cat;
+      visibleCount = perPage;
+      displayProducts(cat);
     }
 
-    // Búsqueda
-    busquedaInput.addEventListener("input", () => {
-      const q = busquedaInput.value.toLowerCase();
-      productosFiltrados = productos.filter(p =>
-        p.Nombre.toLowerCase().includes(q) || p.Descripcion.toLowerCase().includes(q)
+    function displayProducts(cat="todos") {
+      const grid = document.getElementById("productsGrid");
+      const searchText = document.getElementById("searchInput").value.toLowerCase();
+
+      let filtered = products.filter(p =>
+        (cat==="todos" || p.categoria===cat) &&
+        (p.nombre.toLowerCase().includes(searchText) || (p.descripcion||"").toLowerCase().includes(searchText))
       );
-      mostrarProductos(productosFiltrados);
+
+      let toShow = filtered.slice(0, visibleCount);
+
+      if (toShow.length===0) {
+        grid.innerHTML = "<p style='color:white;'>No hay productos disponibles.</p>";
+        document.getElementById("loadMoreBtn").style.display = "none";
+        return;
+      }
+
+      grid.innerHTML = toShow.map(p => `
+        <div class="product-card" onclick="openModal('${p.nombre}')">
+          <img class="product-image" src="${p.imagen1 || 'https://via.placeholder.com/250x200?text=Sin+Imagen'}" alt="${p.nombre}">
+          <div class="product-info">
+            <div class="product-name">${p.nombre}</div>
+            <div class="product-price">$${parseFloat(p.precio).toLocaleString('es-CO')}</div>
+            <div class="product-category">${p.categoria}</div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById("loadMoreBtn").style.display = filtered.length > visibleCount ? "block" : "none";
+    }
+
+    document.getElementById("loadMoreBtn").onclick = function() {
+      visibleCount += perPage;
+      displayProducts(currentCategory);
+    };
+
+    document.getElementById("searchInput").addEventListener("input", () => {
+      visibleCount = perPage;
+      displayProducts(currentCategory);
     });
 
-    // Modal
-    function abrirModal(i) {
-      const p = productos[i];
-      modal.style.display = "block";
-      modalNombre.textContent = p.Nombre;
-      modalPrecio.textContent = "Precio: $" + p.Precio;
-      modalDescripcion.textContent = p.Descripcion;
-      imagenesModal = p.imagenes;
-      indiceImagen = 0;
-      mostrarImagenModal();
+    function openModal(name) {
+      const product = products.find(p => p.nombre === name);
+      if (!product) return;
+      currentProduct = product;
 
-      document.getElementById("shareBtn").onclick = () => {
-        const urlCompartir = window.location.origin + window.location.pathname + "?producto=" + encodeURIComponent(p.Nombre);
-        navigator.clipboard.writeText(urlCompartir);
-        alert("Enlace copiado: " + urlCompartir);
-      };
+      document.getElementById("modalTitle").textContent = product.nombre;
+      document.getElementById("modalPrice").textContent = "$" + parseFloat(product.precio).toLocaleString('es-CO');
+      document.getElementById("modalDescription").textContent = product.descripcion || "Sin descripción disponible";
+
+      currentImages = [product.imagen1, product.imagen2, product.imagen3, product.imagen4, product.imagen5].filter(Boolean);
+      currentIndex = 0;
+      updateCarousel();
+
+      document.getElementById("productModal").style.display = "flex";
+      document.body.style.overflow = "hidden";
     }
 
-    function mostrarImagenModal() {
-      modalImagen.src = imagenesModal[indiceImagen];
+    function closeModal() {
+      document.getElementById("productModal").style.display = "none";
+      currentProduct = null;
+      document.body.style.overflow = "auto";
     }
 
-    document.querySelector(".prev").onclick = () => {
-      indiceImagen = (indiceImagen - 1 + imagenesModal.length) % imagenesModal.length;
-      mostrarImagenModal();
-    };
-    document.querySelector(".next").onclick = () => {
-      indiceImagen = (indiceImagen + 1) % imagenesModal.length;
-      mostrarImagenModal();
-    };
-
-    closeModal.onclick = () => modal.style.display = "none";
-    window.onclick = e => { if (e.target == modal) modal.style.display = "none"; };
-
-    // Fullscreen al hacer click en imagen del modal
-    modalImagen.onclick = () => {
-      fullscreenView.style.display = "flex";
-      fullscreenImg.src = modalImagen.src;
-    };
-    closeFullscreen.onclick = () => fullscreenView.style.display = "none";
-
-    // Cargar directo por URL
-    function verificarParametroURL() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has("producto")) {
-        const nombre = decodeURIComponent(params.get("producto"));
-        const prod = productos.find(p => p.Nombre === nombre);
-        if (prod) abrirModal(productos.indexOf(prod));
+    function updateCarousel() {
+      if (currentImages.length > 0) {
+        document.getElementById("carouselImage").src = currentImages[currentIndex];
+      } else {
+        document.getElementById("carouselImage").src = "https://via.placeholder.com/400x200?text=Sin+Imagen";
       }
     }
+    function prevImage() {
+      if (currentImages.length > 0) {
+        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+        updateCarousel();
+      }
+    }
+    function nextImage() {
+      if (currentImages.length > 0) {
+        currentIndex = (currentIndex + 1) % currentImages.length;
+        updateCarousel();
+      }
+    }
+
+    // Lightbox
+    function openLightbox() {
+      document.getElementById("lightboxImage").src = currentImages[currentIndex];
+      document.getElementById("lightbox").style.display = "flex";
+    }
+    function closeLightbox() {
+      document.getElementById("lightbox").style.display = "none";
+    }
+
+    document.getElementById("shareBtn").onclick = function() {
+      if (!currentProduct) return;
+      const base = window.location.origin + window.location.pathname;
+      const link = base + "?producto=" + encodeURIComponent(currentProduct.nombre);
+      const shareUrl = document.getElementById("shareUrl");
+      shareUrl.value = link;
+      navigator.clipboard.writeText(link).then(()=>{
+        this.textContent = "✅ Copiado!";
+        setTimeout(()=> this.textContent = "🔗 Generar Link", 2000);
+      });
+    };
+
+    function loadFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const prod = params.get("producto");
+      if (prod) openModal(decodeURIComponent(prod));
+    }
+
+    window.onclick = function(e) {
+      if (e.target.id === "productModal") closeModal();
+      if (e.target.id === "lightbox") closeLightbox();
+    };
+
+    let currentCategory = "todos";
   </script>
 </body>
 </html>
