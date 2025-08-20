@@ -7,8 +7,6 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
     header { background: #333; color: white; padding: 1rem; text-align: center; }
-    .search-bar { text-align: center; margin: 1rem; }
-    .search-bar input { padding: 0.5rem; width: 80%; max-width: 400px; font-size: 1rem; }
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; padding: 1rem; }
     .card { background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
     .card:hover { transform: scale(1.03); }
@@ -27,10 +25,6 @@
   <header>
     <h1>Catálogo de Productos</h1>
   </header>
-
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="🔍 Buscar productos...">
-  </div>
 
   <div class="products-grid" id="productsGrid"></div>
 
@@ -61,26 +55,21 @@
       });
 
     // Mostrar productos
-    function displayProducts(searchQuery = "") {
+    function displayProducts() {
       const grid = document.getElementById("productsGrid");
       grid.innerHTML = "";
 
-      products
-        .filter(p =>
-          p.nombre.toLowerCase().includes(searchQuery) ||
-          p.descripcion.toLowerCase().includes(searchQuery)
-        )
-        .forEach(p => {
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <img src="${p.imagen1}" alt="${p.nombre}">
-            <h3>${p.nombre}</h3>
-            <p class="price">$${Number(p.precio).toLocaleString("es-CO")}</p>
-          `;
-          card.onclick = () => openModal(p.ID);
-          grid.appendChild(card);
-        });
+      products.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="${p.imagen1}" alt="${p.nombre}">
+          <h3>${p.nombre}</h3>
+          <p class="price">$${Number(p.precio).toLocaleString("es-CO")}</p>
+        `;
+        card.onclick = () => openModal(p.ID);
+        grid.appendChild(card);
+      });
     }
 
     // Abrir modal
@@ -111,12 +100,6 @@
     document.getElementById("closeModal").onclick = () => {
       document.getElementById("productModal").style.display = "none";
     };
-
-    // Buscar desde la barra
-    document.getElementById("searchInput").addEventListener("input", function(e) {
-      const query = e.target.value.toLowerCase();
-      displayProducts(query);
-    });
 
     // Revisar si hay producto en la URL
     function checkUrlForProduct() {
