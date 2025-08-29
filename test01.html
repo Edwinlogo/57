@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elige tu Camino - DCEdwin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+            position: relative;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            cursor: grab;
+            user-select: none;
+        }
+
+        .logo-container:active {
+            cursor: grabbing;
+        }
+
+        .logo-container.dragging {
+            transition: none;
+            z-index: 200;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .logo-container:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-container.open {
+            /* Mantener forma circular y tamaño */
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #333;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+            pointer-events: none;
+        }
+
+        .logo-container.open .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+        }
+
+        .dropdown-item {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 1;
+            line-height: 1.2;
+        }
+
+        .logo-container.open .dropdown-item {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Posiciones de los pétalos */
+        .dropdown-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+        .logo-container.open .dropdown-item:nth-child(1) {
+            transform: translate(-50%, -50%) translate(0, -110px) scale(1);
+        }
+
+        .dropdown-item:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+        .logo-container.open .dropdown-item:nth-child(2) {
+            transform: translate(-50%, -50%) translate(95px, -55px) scale(1);
+        }
+
+        .dropdown-item:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        .logo-container.open .dropdown-item:nth-child(3) {
+            transform: translate(-50%, -50%) translate(95px, 55px) scale(1);
+        }
+
+        .dropdown-item:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+        .logo-container.open .dropdown-item:nth-child(4) {
+            transform: translate(-50%, -50%) translate(0, 110px) scale(1);
+        }
+
+        .dropdown-item:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+        .logo-container.open .dropdown-item:nth-child(5) {
+            transform: translate(-50%, -50%) translate(-95px, 55px) scale(1);
+        }
+
+        .dropdown-item:nth-child(6) {
+            animation-delay: 0.35s;
+        }
+        .logo-container.open .dropdown-item:nth-child(6) {
+            transform: translate(-50%, -50%) translate(-95px, -55px) scale(1);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 138, 51, 0.95);
+            color: white;
+            transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)) scale(1.2);
+            box-shadow: 0 15px 40px rgba(255, 138, 51, 0.3);
+            border-color: rgba(255, 138, 51, 0.5);
+        }
+
+        /* Actualizar posiciones hover para cada pétalo */
+        .logo-container.open .dropdown-item:nth-child(1):hover {
+            --x: 0;
+            --y: -110px;
+        }
+        .logo-container.open .dropdown-item:nth-child(2):hover {
+            --x: 95px;
+            --y: -55px;
+        }
+        .logo-container.open .dropdown-item:nth-child(3):hover {
+            --x: 95px;
+            --y: 55px;
+        }
+        .logo-container.open .dropdown-item:nth-child(4):hover {
+            --x: 0;
+            --y: 110px;
+        }
+        .logo-container.open .dropdown-item:nth-child(5):hover {
+            --x: -95px;
+            --y: 55px;
+        }
+        .logo-container.open .dropdown-item:nth-child(6):hover {
+            --x: -95px;
+            --y: -55px;
+        }
+
+        .dropdown-separator {
+            display: none;
+        }
+
+        .close-indicator {
+            display: none;
+        }
+
+        .option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option.expanded {
+            flex: 2;
+        }
+
+        .option.collapsed {
+            flex: 0.3;
+        }
+
+        .expanded-content {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease 0.3s;
+        }
+
+        .option.expanded .expanded-content {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .services-list {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .services-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .service-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .service-item:last-child {
+            border-bottom: none;
+        }
+
+        .service-item:hover {
+            transform: translateX(10px);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .service-icon {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .service-name {
+            font-weight: 500;
+        }
+
+        .constructor {
+            background: linear-gradient(135deg, #8a9ba8 0%, #667481 50%, #4a5568 100%);
+            color: white;
+        }
+
+        .digital {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 50%, #2f855a 100%);
+            color: white;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .option:hover::before {
+            opacity: 1;
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+            transform: scale(1);
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            transform: translateY(0);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-align: center;
+            max-width: 300px;
+            transform: translateY(0);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        /* Efectos dinámicos para Constructor */
+        .constructor:hover .icon {
+            transform: scale(1.2) rotateY(15deg);
+            text-shadow: 0 10px 30px rgba(138, 155, 168, 0.5);
+        }
+
+        .constructor:hover .title,
+        .constructor:hover .subtitle {
+            transform: translateY(-10px);
+            text-shadow: 0 5px 20px rgba(138, 155, 168, 0.3);
+        }
+
+        /* Efectos dinámicos para Digital */
+        .digital:hover .icon {
+            transform: scale(1.2) rotateZ(10deg);
+            text-shadow: 0 10px 30px rgba(72, 187, 120, 0.5);
+        }
+
+        .digital:hover .title,
+        .digital:hover .subtitle {
+            transform: translateY(-10px);
+            text-shadow: 0 5px 20px rgba(72, 187, 120, 0.3);
+        }
+
+        /* Efectos de partículas */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes floatHorizontal {
+            0% {
+                transform: translateX(-10vw) translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(110vw) translateY(50vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .constructor .particle {
+            animation: floatHorizontal 8s infinite linear;
+        }
+
+        /* Efectos de clic */
+        .option.clicked {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .logo-container {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo {
+                width: 70px;
+                height: 70px;
+                font-size: 1.5rem;
+            }
+            
+            .dropdown-menu {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .dropdown-item {
+                width: 65px;
+                height: 65px;
+                font-size: 0.7rem;
+            }
+            
+            /* Posiciones ajustadas para móvil */
+            .logo-container.open .dropdown-item:nth-child(1) {
+                transform: translate(-50%, -50%) translate(0, -90px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(2) {
+                transform: translate(-50%, -50%) translate(78px, -45px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(3) {
+                transform: translate(-50%, -50%) translate(78px, 45px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(4) {
+                transform: translate(-50%, -50%) translate(0, 90px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(5) {
+                transform: translate(-50%, -50%) translate(-78px, 45px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(6) {
+                transform: translate(-50%, -50%) translate(-78px, -45px) scale(1);
+            }
+            
+            /* Hover ajustado para móvil */
+            .logo-container.open .dropdown-item:nth-child(1):hover { --x: 0; --y: -90px; }
+            .logo-container.open .dropdown-item:nth-child(2):hover { --x: 78px; --y: -45px; }
+            .logo-container.open .dropdown-item:nth-child(3):hover { --x: 78px; --y: 45px; }
+            .logo-container.open .dropdown-item:nth-child(4):hover { --x: 0; --y: 90px; }
+            .logo-container.open .dropdown-item:nth-child(5):hover { --x: -78px; --y: 45px; }
+            .logo-container.open .dropdown-item:nth-child(6):hover { --x: -78px; --y: -45px; }
+            
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .icon {
+                font-size: 3rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-container {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .logo {
+                width: 60px;
+                height: 60px;
+                font-size: 1.2rem;
+            }
+            
+            .dropdown-menu {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .dropdown-item {
+                width: 55px;
+                height: 55px;
+                font-size: 0.6rem;
+            }
+            
+            /* Posiciones más compactas para móviles pequeños */
+            .logo-container.open .dropdown-item:nth-child(1) {
+                transform: translate(-50%, -50%) translate(0, -75px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(2) {
+                transform: translate(-50%, -50%) translate(65px, -37px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(3) {
+                transform: translate(-50%, -50%) translate(65px, 37px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(4) {
+                transform: translate(-50%, -50%) translate(0, 75px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(5) {
+                transform: translate(-50%, -50%) translate(-65px, 37px) scale(1);
+            }
+            .logo-container.open .dropdown-item:nth-child(6) {
+                transform: translate(-50%, -50%) translate(-65px, -37px) scale(1);
+            }
+            
+            /* Hover ajustado para móviles pequeños */
+            .logo-container.open .dropdown-item:nth-child(1):hover { --x: 0; --y: -75px; }
+            .logo-container.open .dropdown-item:nth-child(2):hover { --x: 65px; --y: -37px; }
+            .logo-container.open .dropdown-item:nth-child(3):hover { --x: 65px; --y: 37px; }
+            .logo-container.open .dropdown-item:nth-child(4):hover { --x: 0; --y: 75px; }
+            .logo-container.open .dropdown-item:nth-child(5):hover { --x: -65px; --y: 37px; }
+            .logo-container.open .dropdown-item:nth-child(6):hover { --x: -65px; --y: -37px; }
+            
+            .close-indicator {
+                display: none;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .icon {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Hover states para móvil */
+        @media (hover: none) {
+            .option:active::before {
+                opacity: 1;
+            }
+            
+            .option:active .icon {
+                transform: scale(1.1);
+            }
+            
+            .option:active .title,
+            .option:active .subtitle {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container" id="logoContainer">
+            <div class="logo">DC</div>
+            <div class="dropdown-menu">
+                <a href="#nosotros" class="dropdown-item">Nosotros</a>
+                <a href="#servicios" class="dropdown-item">Servicios</a>
+                <a href="#contacto" class="dropdown-item">Contacto</a>
+                <a href="#blog" class="dropdown-item">Blog</a>
+                <a href="#portfolio" class="dropdown-item">Portfolio</a>
+                <a href="#equipo" class="dropdown-item">Equipo</a>
+            </div>
+        </div>
+        
+        <div class="option digital" data-url="https://digital.dcedwin.com">
+            <div class="particles" id="digital-particles"></div>
+            <div class="icon">💻</div>
+            <div class="title">DIGITAL</div>
+            <div class="subtitle">Innovación tecnológica y soluciones digitales</div>
+            <div class="expanded-content">
+                <div class="services-list">
+                    <div class="services-title">Servicios Digitales</div>
+                    <div class="service-item">
+                        <span class="service-icon">🌐</span>
+                        <span class="service-name">Desarrollo Web</span>
+                    </div>
+                    <div class="service-item">
+                        <span class="service-icon">📱</span>
+                        <span class="service-name">Apps Móviles</span>
+                    </div>
+                    <div class="service-item">
+                        <span class="service-icon">☁️</span>
+                        <span class="service-name">Cloud Solutions</span>
+                    </div>
+                    <div class="service-item">
+                        <span class="service-icon">🤖</span>
+                        <span class="service-name">Automati
