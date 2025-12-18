@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de Persecución del Puntero</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      cursor: url('lombriz.png') 16 16, auto; /* Usar imagen lombriz.png como cursor */
+      background-color: #282828;
+    }
+
+    #gameArea {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background-color: #000;
+    }
+
+    /* Estilos para el primer target (gallina) */
+    #target1 {
+      position: absolute;
+      width: 150px;  /* Tamaño del target aumentado a 150x150 */
+      height: 150px; /* Tamaño del target aumentado a 150x150 */
+      background-image: url('gallina1.png');
+      background-size: 100%; /* Usar tamaño original de la imagen */
+      background-repeat: no-repeat;
+      background-position: center;
+      transition: top 0.8s, left 0.8s, transform 0.8s; /* Velocidad de movimiento del target más lenta */
+    }
+
+    /* Estilos para el segundo target (perro) */
+    #target2 {
+      position: absolute;
+      width: 150px;  /* Tamaño del target aumentado a 150x150 */
+      height: 150px; /* Tamaño del target aumentado a 150x150 */
+      background-image: url('perro.gif');
+      background-size: 100%; /* Usar tamaño original de la imagen */
+      background-repeat: no-repeat;
+      background-position: center;
+      transition: top 0.8s, left 0.8s, transform 0.8s; /* Velocidad de movimiento del target más lenta */
+    }
+
+    /* Estilos para el tercer target (ganso) */
+    #target3 {
+      position: absolute;
+      width: 150px;  /* Tamaño del target aumentado a 150x150 */
+      height: 150px; /* Tamaño del target aumentado a 150x150 */
+      background-image: url('ganso.gif');
+      background-size: 100%; /* Usar tamaño original de la imagen */
+      background-repeat: no-repeat;
+      background-position: center;
+      transition: top 0.8s, left 0.8s, transform 0.8s; /* Velocidad de movimiento del target más lenta */
+    }
+
+    #score {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: green;
+    }
+
+    #highScore {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+      color: yellow;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Puntuación: 0</div>
+  <div id="highScore">Mejor puntuación: 0</div>
+  <div id="gameArea">
+    <div id="target1"></div>
+    <div id="target2"></div> <!-- Segundo target -->
+    <div id="target3"></div> <!-- Tercer target -->
+  </div>
+
+  <!-- Elemento de audio para reproducir el sonido de gallina -->
+  <audio id="targetSound1" src="gallina.mp3" preload="auto"></audio>
+
+  <!-- Elemento de audio para reproducir el sonido de perro -->
+  <audio id="targetSound2" src="perro.wav" preload="auto"></audio>
+
+  <!-- Elemento de audio para reproducir el sonido de ganso -->
+  <audio id="targetSound3" src="ganso.mp3" preload="auto"></audio>
+
+  <script>
+    const target1 = document.getElementById('target1');
+    const target2 = document.getElementById('target2');
+    const target3 = document.getElementById('target3');
+    const scoreDisplay = document.getElementById('score');
+    const highScoreDisplay = document.getElementById('highScore');
+    let score = 0;
+    let highScore = localStorage.getItem('highScore') || 0;
+
+    // Mostrar la mejor puntuación
+    highScoreDisplay.textContent = `Mejor puntuación: ${highScore}`;
+
+    // Desactivar el menú de clic derecho
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Función para mover los targets a una posición aleatoria dentro del área de juego
+    function moveTarget(target) {
+      const gameArea = document.getElementById('gameArea');
+      const gameAreaWidth = gameArea.clientWidth;
+      const gameAreaHeight = gameArea.clientHeight;
+
+      const targetSize = target.offsetWidth;
+      const maxX = gameAreaWidth - targetSize;
+      const maxY = gameAreaHeight - targetSize;
+
+      const randomX = Math.floor(Math.random() * maxX);
+      const randomY = Math.floor(Math.random() * maxY);
+
+      target.style.left = `${randomX}px`;
+      target.style.top = `${randomY}px`;
+    }
+
+    // Función para verificar si el cursor está sobre la meta y moverla si es así
+    function checkCursorPosition(event) {
+      const rect1 = target1.getBoundingClientRect();
+      const rect2 = target2.getBoundingClientRect();
+      const rect3 = target3.getBoundingClientRect();
+      const x = event.clientX;
+      const y = event.clientY;
+
+      // Verificar si el cursor está sobre el primer target (gallina)
+      if (x >= rect1.left && x <= rect1.right && y >= rect1.top && y <= rect1.bottom) {
+        score++; // Incrementar la puntuación
+        scoreDisplay.textContent = `Puntuación: ${score}`;
+        
+        // Reproducir sonido de gallina cuando el cursor pasa sobre el objetivo
+        const targetSound1 = document.getElementById('targetSound1');
+        targetSound1.play().catch(error => {
+          console.error('Error al reproducir el sonido de gallina:', error);
+        });
+
+        // Cambiar la imagen del primer target solo mientras se mueve
+        target1.style.backgroundImage = 'url("gallina2.png")';
+
+        // Mover el primer target a una nueva posición
+        moveTarget(target1); 
+
+        // Después de un pequeño retraso, restaurar la imagen original de gallina
+        setTimeout(() => {
+          target1.style.backgroundImage = 'url("gallina1.png")';
+        }, 800); // El tiempo debe coincidir con la duración de la transición (0.8s)
+      }
+
+      // Verificar si el cursor está sobre el segundo target (perro)
+      if (x >= rect2.left && x <= rect2.right && y >= rect2.top && y <= rect2.bottom) {
+        score++; // Incrementar la puntuación
+        scoreDisplay.textContent = `Puntuación: ${score}`;
+        
+        // Reproducir sonido de perro cuando el cursor pasa sobre el objetivo
+        const targetSound2 = document.getElementById('targetSound2');
+        targetSound2.play().catch(error => {
+          console.error('Error al reproducir el sonido de perro:', error);
+        });
+
+        // Cambiar la imagen del segundo target
+        target2.style.backgroundImage = 'url("perro.gif")';
+
+        // Mover el segundo target a una nueva posición
+        moveTarget(target2); 
+      }
+
+      // Verificar si el cursor está sobre el tercer target (ganso)
+      if (x >= rect3.left && x <= rect3.right && y >= rect3.top && y <= rect3.bottom) {
+        score++; // Incrementar la puntuación
+        scoreDisplay.textContent = `Puntuación: ${score}`;
+        
+        // Reproducir sonido de ganso cuando el cursor pasa sobre el objetivo
+        const targetSound3 = document.getElementById('targetSound3');
+        targetSound3.play().catch(error => {
+          console.error('Error al reproducir el sonido de ganso:', error);
+        });
+
+        // Cambiar la imagen del tercer target
+        target3.style.backgroundImage = 'url("ganso.gif")';
+
+        // Mover el tercer target a una nueva posición
+        moveTarget(target3); 
+      }
+    }
+
+    // Mover los targets a posiciones iniciales aleatorias
+    moveTarget(target1);
+    moveTarget(target2);
+    moveTarget(target3);
+
+    // Evento que detecta la posición del puntero
+    document.addEventListener('mousemove', checkCursorPosition);
+  </script>
+</body>
+</html>
